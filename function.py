@@ -75,11 +75,8 @@ def remove_custom_stopwords(sentence, custom_stopwords_file):
             custom_stopwords.add(line.strip())
 
     words = word_tokenize(sentence)
-
     filtered_words = [word for word in words if word.lower() not in custom_stopwords]
-
     cleaned_text = ' '.join(filtered_words)
-
     return cleaned_text
 
 def stemming_text(sentence):
