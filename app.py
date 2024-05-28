@@ -10,7 +10,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-from function import case_folding, load_abbreviation_file, normalize_text, remove_custom_stopwords, stemming_text
+from utils import case_folding, load_abbreviation_file, normalize_text, remove_custom_stopwords, stemming_text
 
 app = Flask(__name__)
 
