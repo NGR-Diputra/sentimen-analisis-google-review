@@ -36,7 +36,7 @@ def load_abbreviation_file(file_path):
         return {}
 
 #Reading the abbreviation file path for preprocessing
-file_path = "abbreviation_file.txt"
+file_path = "model/abbreviation_file.txt"
 abbreviation_file = load_abbreviation_file(file_path)
 
 def normalize_text(sentence):
@@ -55,7 +55,7 @@ def stopwords_removal(sentence):
     tokens = word_tokenize(sentence)
     liststopwords =  set(stopwords.words('indonesian'))
 
-    custom_stopwords_file = "more_stopwords.txt"
+    custom_stopwords_file = "model/more_stopwords.txt"
 
     custom_stopwords = set()
     with open(custom_stopwords_file, "r") as file:
