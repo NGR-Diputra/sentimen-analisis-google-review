@@ -12,6 +12,8 @@ from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from utils import case_folding, load_abbreviation_file, normalize_text, remove_custom_stopwords, stemming_text
 
+#------------- RUNNNING THE FLASK APP -------------
+
 app = Flask(__name__)
 
 # Load the model and tokenizer
@@ -38,7 +40,7 @@ def preprocess_text(text):
     
     case_folding(text)
     normalize_text(text)
-    remove_custom_stopwords(text, custom_stopwords_file="more_stopwords.txt")
+    remove_custom_stopwords(text, custom_stopwords_file="model/more_stopwords.txt")
     stemming_text(text)
     return text
 
@@ -60,6 +62,7 @@ def perform_sentiment_analysis(text):
 
     return sentiment
 
-
 if __name__ == '__main__':
     app.run(debug=True)
+
+#------------- RUNNNING THE FLASK APP -------------
