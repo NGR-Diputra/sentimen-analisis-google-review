@@ -2,9 +2,24 @@ import string
 import re
 import json
 import nltk
+from pathlib import Path
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+
+
+# ============================================================
+# BASE DIRECTORY
+# ============================================================
+
+# Get the directory where this utils.py file is located
+BASE_DIR = Path(__file__).resolve().parent
+
+
+# ============================================================
+# CASE FOLDING
+# ============================================================
 
 def case_folding(sentence):
     emoji_pattern = re.compile("["
@@ -21,67 +36,120 @@ def case_folding(sentence):
         "]+", flags=re.UNICODE)
 
     sentence = emoji_pattern.sub(r'', sentence)
-    sentence = sentence.translate(str.maketrans("","", string.punctuation)).lower()
+
+    sentence = sentence.translate(
+        str.maketrans("", "", string.punctuation)
+    ).lower()
+
     sentence = re.sub(r"\d+", "", sentence)
     sentence = sentence.replace("/", " ")
+
     return sentence
+
+
+# ============================================================
+# LOAD ABBREVIATION FILE
+# ============================================================
 
 def load_abbreviation_file(file_path):
     try:
-        with open(file_path, "r") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             abbreviations = json.load(file)
+
         return abbreviations
-    except FileExistsError:
-        print(f"File not found {file_path}")
+
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
         return {}
 
-#Reading the abbreviation file path for preprocessing
-file_path = "model/abbreviation_file.txt"
+
+# Reading the abbreviation file path for preprocessing
+file_path = BASE_DIR / "model" / "abbreviation_file.txt"
+
 abbreviation_file = load_abbreviation_file(file_path)
+
+
+# ============================================================
+# NORMALIZE TEXT
+# ============================================================
 
 def normalize_text(sentence):
     words = sentence.lower().split()
     words_normalized = []
+
     for word in words:
         for full_form, abbreviations in abbreviation_file.items():
+
             if word.lower() in abbreviations:
                 words_normalized.append(full_form)
                 break
+
         else:
             words_normalized.append(word)
+
     return " ".join(words_normalized)
+
+
+# ============================================================
+# STOPWORDS REMOVAL
+# ============================================================
 
 def stopwords_removal(sentence):
     tokens = word_tokenize(sentence)
-    liststopwords =  set(stopwords.words('indonesian'))
 
-    custom_stopwords_file = "model/more_stopwords.txt"
+    liststopwords = set(stopwords.words("indonesian"))
+
+    custom_stopwords_file = BASE_DIR / "model" / "more_stopwords.txt"
 
     custom_stopwords = set()
-    with open(custom_stopwords_file, "r") as file:
+
+    with open(custom_stopwords_file, "r", encoding="utf-8") as file:
         for line in file:
             custom_stopwords.add(line.strip())
 
     combined_stopwords = liststopwords.union(custom_stopwords)
 
-    with open(custom_stopwords_file, "w") as file:
-        for word in combined_stopwords:
-            file.write(word + "\n")
+    filtered_words = [
+        word
+        for word in tokens
+        if word.lower() not in combined_stopwords
+    ]
+
+    return " ".join(filtered_words)
+
+
+# ============================================================
+# REMOVE CUSTOM STOPWORDS
+# ============================================================
 
 def remove_custom_stopwords(sentence, custom_stopwords_file):
     custom_stopwords = set()
-    with open(custom_stopwords_file, 'r') as file:
+
+    with open(custom_stopwords_file, "r", encoding="utf-8") as file:
         for line in file:
             custom_stopwords.add(line.strip())
 
     words = word_tokenize(sentence)
-    filtered_words = [word for word in words if word.lower() not in custom_stopwords]
-    cleaned_text = ' '.join(filtered_words)
+
+    filtered_words = [
+        word
+        for word in words
+        if word.lower() not in custom_stopwords
+    ]
+
+    cleaned_text = " ".join(filtered_words)
+
     return cleaned_text
+
+
+# ============================================================
+# STEMMING
+# ============================================================
 
 def stemming_text(sentence):
     factory = StemmerFactory()
-    Stemmer = factory.create_stemmer()
+    stemmer = factory.create_stemmer()
 
-    sentence = Stemmer.stem(sentence)
+    sentence = stemmer.stem(sentence)
+
     return sentence
